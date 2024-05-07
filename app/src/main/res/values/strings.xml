@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Ember\'s Pokedex</string>
+    <string name="card_pokemon_name">Pokemon</string>
+    <string name="navigation_drawer_open">drawer open</string>
+    <string name="navigation_drawer_close">drawer closed</string>
+</resources>

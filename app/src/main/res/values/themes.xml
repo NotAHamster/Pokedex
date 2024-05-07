@@ -1,0 +1,15 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.Pokedex" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <item name="colorPrimary">@color/dexBackground</item>
+        <item name="colorPrimaryDark">@color/black</item>
+        <item name="colorAccent">@color/white</item>
+    </style>
+
+    <!--<style name="Theme.Pokedex" parent="Base.Theme.Pokedex" />-->
+    
+    <style name="Theme.Pokedex_Red" parent="Base.Theme.Pokedex">
+        <item name="colorPrimary">@color/dexBackground_red</item>
+    </style>
+</resources>
