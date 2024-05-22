@@ -1,5 +1,8 @@
 package com.ecl.pokedex
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,11 +14,31 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.LinkedList
 
 class RV_PokedexAdapter(
-    val dataset: List<CardPokemon>,
-    private val cardSize: Int
+    val dataset: List<PokemonCardItem>,
+    imgSize: Int,
+    context: Context
 ) : RecyclerView.Adapter<RV_PokedexAdapter.ViewHolder>() {
+    private val defaultImg: Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.card_foreground)
+
+    val NRM = NetworkRequestManager(imgSize)
+    init {
+        NRM.onReceived = { pciData: NetworkRequestManager.PCI_Data ->
+            dataset[pciData.pos].apply {
+                image = pciData.bitmap
+                name = pciData.name
+            }
+            notifyItemChanged(pciData.pos)
+        }
+    }
+
+    fun requestNewData(fPos: Int, lPos: Int) {
+        for (i in fPos .. lPos) {
+            NRM.reqData(dataset[i].id, i)
+        }
+    }
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val pc_ImageView: ImageView
@@ -34,15 +57,34 @@ class RV_PokedexAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        CoroutineScope(Dispatchers.IO).launch {
-            val pokemon = PokemonUtils(network.getPokemon(dataset[position].id))
-
-            withContext(Dispatchers.Main) {
-                holder.pc_TextView.text = pokemon.name()
-                pokemon.imageInto(holder.pc_ImageView, cardSize)
-            }
-        }
+        holder.pc_TextView.text = dataset[position].name
+        if (dataset[position].isImageSet())
+            holder.pc_ImageView.setImageBitmap(dataset[position].image)
+        else
+            holder.pc_ImageView.setImageBitmap(defaultImg)
     }
 
     override fun getItemCount() = dataset.size
+}
+
+class NetworkRequestManager(var imgSize: Int) {
+    private val reqQueue: MutableList<Int> = LinkedList()
+    var onReceived: ((PCI_Data)->Unit)? = null
+
+    data class PCI_Data(val pos: Int, val name: String, val bitmap: Bitmap)
+
+    fun reqData(id: Int, pos: Int): Boolean {
+        if (reqQueue.contains(id))
+            return false
+
+        reqQueue.add(id)
+        CoroutineScope(Dispatchers.IO).launch {
+            val pokemon = PokemonUtils(network.getPokemon(id))
+            val bitmap = pokemon.imageToBmp(imgSize)
+            withContext(Dispatchers.Main) {
+                onReceived?.invoke(PCI_Data(pos, pokemon.name(), bitmap))
+            }
+        }
+        return true
+    }
 }

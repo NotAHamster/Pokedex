@@ -1,6 +1,7 @@
 package com.ecl.pokedex.io
 
 import me.sargunvohra.lib.pokekotlin.client.PokeApiClient
+import me.sargunvohra.lib.pokekotlin.model.Generation
 import me.sargunvohra.lib.pokekotlin.model.NamedApiResourceList
 import me.sargunvohra.lib.pokekotlin.model.Pokedex
 import me.sargunvohra.lib.pokekotlin.model.Pokemon
@@ -15,6 +16,7 @@ class Network {
         private val pokemon: MutableList<Pokemon> = mutableListOf()
         private val pokemonSpecies: MutableList<PokemonSpecies> = mutableListOf()
         private val pokedex: MutableList<Pokedex> = mutableListOf()
+        private val generation: MutableList<Generation> = mutableListOf()
 
         fun getPokemon(id: Int): Pokemon? {
             return pokemon.find { it.id == id }
@@ -42,6 +44,14 @@ class Network {
 
         fun addPokedex(pokedex: Pokedex) {
             this.pokedex.add(pokedex)
+        }
+
+        fun getGeneration(id: Int): Generation? {
+            return generation.find { it.id == id }
+        }
+
+        fun addGeneration(generation: Generation) {
+            this.generation.add(generation)
         }
 
         fun clear() {
@@ -100,6 +110,17 @@ class Network {
                 entries.subList(offset, limit)
         else
             listOf()
+    }
+
+    fun getGendex(id: Int): Generation {
+        val generation = cache.getGeneration(id)
+        return if (generation != null) {
+            generation
+        } else {
+            val gen = apiClient.getGeneration(id)
+            cache.addGeneration(gen)
+            gen
+        }
     }
 
     fun onPause() {

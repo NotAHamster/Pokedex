@@ -4,10 +4,10 @@ import me.sargunvohra.lib.pokekotlin.model.NamedApiResource
 
 class PokemonListUtils(val namedApiResourceList: List<NamedApiResource>) {
 
-    fun getCards(): List<CardPokemon> {
+    fun getCardItems(): List<PokemonCardItem> {
         return List(
             namedApiResourceList.size,
-            init = {index -> CardPokemon(namedApiResourceList[index].id) }
+            init = { index -> PokemonCardItem(namedApiResourceList[index].id) }
         )
     }
 }

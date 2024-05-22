@@ -14,8 +14,8 @@ class PokemonUtils(private val pokemon: Pokemon) {
         return Picasso.get().load(pokemon.sprites.frontDefault).resize(size, size).get()
     }
 
-    fun toCard(): CardPokemon {
-        return CardPokemon(pokemon.id)
+    fun toCard(): PokemonCardItem {
+        return PokemonCardItem(pokemon.id, pokemon.name)
     }
 
     fun name(): String {

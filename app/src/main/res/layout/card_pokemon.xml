@@ -41,7 +41,7 @@
             android:id="@+id/iv_cardPokemon"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:srcCompat="@drawable/ic_launcher_foreground" />
+            app:srcCompat="@drawable/card_foreground" />
 
 
         <androidx.constraintlayout.widget.ConstraintLayout
