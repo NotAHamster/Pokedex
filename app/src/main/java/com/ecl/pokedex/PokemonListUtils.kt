@@ -7,7 +7,11 @@ class PokemonListUtils(val namedApiResourceList: List<NamedApiResource>) {
     fun getCardItems(): List<PokemonCardItem> {
         return List(
             namedApiResourceList.size,
-            init = { index -> PokemonCardItem(namedApiResourceList[index].id) }
+            init = {index ->
+                namedApiResourceList[index].let {
+                    PokemonCardItem(it.id, it.name)
+                }
+            }
         )
     }
 }
