@@ -1,5 +1,6 @@
 package com.ecl.pokedex
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -17,7 +18,7 @@ import kotlinx.coroutines.withContext
 import java.util.LinkedList
 
 class RV_PokedexAdapter(
-    val dataset: List<PokemonCardItem>,
+    var dataset: List<PokemonCardItem>,
     imgSize: Int,
     context: Context
 ) : RecyclerView.Adapter<RV_PokedexAdapter.ViewHolder>() {
@@ -27,10 +28,11 @@ class RV_PokedexAdapter(
     init {
         NRM.onReceived = { pciData: NetworkRequestManager.PCI_Data ->
             dataset[pciData.pos].apply {
+                if (id != pciData.id)
+                    return@apply
                 image = pciData.bitmap
-                name = pciData.name
+                notifyItemChanged(pciData.pos)
             }
-            notifyItemChanged(pciData.pos)
         }
     }
 
@@ -38,6 +40,13 @@ class RV_PokedexAdapter(
         for (i in fPos .. lPos) {
             NRM.reqData(dataset[i].id, i)
         }
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun swapNewData(newData: List<PokemonCardItem>) {
+        NRM.clearHistory()
+        dataset = newData
+        notifyDataSetChanged()
     }
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -68,23 +77,25 @@ class RV_PokedexAdapter(
 }
 
 class NetworkRequestManager(var imgSize: Int) {
-    private val reqQueue: MutableList<Int> = LinkedList()
+    private val reqHistory: MutableList<Int> = LinkedList()
     var onReceived: ((PCI_Data)->Unit)? = null
 
-    data class PCI_Data(val pos: Int, val name: String, val bitmap: Bitmap)
+    data class PCI_Data(val pos: Int, val id: Int, val bitmap: Bitmap)
 
     fun reqData(id: Int, pos: Int): Boolean {
-        if (reqQueue.contains(id))
+        if (reqHistory.contains(id))
             return false
 
-        reqQueue.add(id)
+        reqHistory.add(id)
         CoroutineScope(Dispatchers.IO).launch {
             val pokemon = PokemonUtils(network.getPokemon(id))
             val bitmap = pokemon.imageToBmp(imgSize)
             withContext(Dispatchers.Main) {
-                onReceived?.invoke(PCI_Data(pos, pokemon.name(), bitmap))
+                onReceived?.invoke(PCI_Data(pos, id, bitmap))
             }
         }
         return true
     }
+
+    fun clearHistory() = reqHistory.clear()
 }

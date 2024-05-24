@@ -4,4 +4,5 @@
     <color name="dexBackground_red">#ff5a00</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="highlight">#B3FFFFFF</color>
 </resources>

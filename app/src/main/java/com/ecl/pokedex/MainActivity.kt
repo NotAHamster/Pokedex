@@ -19,16 +19,6 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Setup the action bar
-        /*val toggle = ActionBarDrawerToggle(
-            this,
-            binding.drawerLayout,
-            R.string.navigation_drawer_open,
-            R.string.navigation_drawer_close
-        )
-        binding.drawerLayout.addDrawerListener(toggle)
-        toggle.syncState()*/
-
         NavDrawer(binding.navView, this)
 
         CoroutineScope(Dispatchers.IO).launch {
@@ -43,20 +33,6 @@ class MainActivity : AppCompatActivity() {
                 binding.rvPokedex.addOnScrollListener(RV_PokedexScrollListener(rvPokedexAdapter))
             }
         }
-        /*binding.rvPokedex.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                val layoutManager = recyclerView.layoutManager as LinearLayoutManager
-                val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
-                val lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition()
-
-                // Load data for items in the visible range
-                rvPokedexAdapter.requestNewData(
-                    firstVisibleItemPosition,
-                    lastVisibleItemPosition
-                )
-            }
-        })*/
     }
 
     override fun onPause() {

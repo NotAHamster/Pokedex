@@ -35,5 +35,7 @@ class RV_PokedexScrollListener(private val rvPokedexAdapter: RV_PokedexAdapter) 
         }
     }
 
+
+
     private fun requestData(fvip: Int, lvip: Int) = rvPokedexAdapter.requestNewData(fvip, lvip)
 }

@@ -8,8 +8,8 @@ class PokemonListUtils(val namedApiResourceList: List<NamedApiResource>) {
         return List(
             namedApiResourceList.size,
             init = {index ->
-                namedApiResourceList[index].let {
-                    PokemonCardItem(it.id, it.name)
+                namedApiResourceList[index].let { nar ->
+                    PokemonCardItem(nar.id, nar.name.replaceFirstChar { it.uppercaseChar() })
                 }
             }
         )
