@@ -54,6 +54,7 @@ class GenerationsActivity: AppCompatActivity() {
                 rvPokedex.adapter = rvPokedexAdapter
                 rvScrollListener = RV_PokedexScrollListener(rvPokedexAdapter)
                 rvPokedex.addOnScrollListener(rvScrollListener)
+                rvPokedexAdapter.cardClick = rvPokedexAdapter.OnClickEvent(this@GenerationsActivity)
             }
         }
     }

@@ -72,8 +72,13 @@ class Network {
         }
     }
 
+    /**
+     * Retrieves a pokemon from the network cache.
+     *
+     * This does not try to request information from the API use if expecting the result to be cached.
+     */
     fun getPokemon(name: String): Pokemon? {
-        return cache.getPokemon(name)
+        return cache.getPokemon(name.lowercase())
     }
 
     fun getPokemonSpecies(id: Int): PokemonSpecies {

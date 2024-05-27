@@ -17,7 +17,7 @@
 
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/cardView"
+        android:id="@+id/cv_pokemon"
         android:layout_width="140dp"
         android:layout_height="140dp"
         app:cardCornerRadius="10dp"

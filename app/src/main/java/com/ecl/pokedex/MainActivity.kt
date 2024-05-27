@@ -31,6 +31,7 @@ class MainActivity : AppCompatActivity() {
                 rvPokedexAdapter = RV_PokedexAdapter(pokemonCards, size, this@MainActivity)
                 binding.rvPokedex.adapter = rvPokedexAdapter
                 binding.rvPokedex.addOnScrollListener(RV_PokedexScrollListener(rvPokedexAdapter))
+                rvPokedexAdapter.cardClick = rvPokedexAdapter.OnClickEvent(this@MainActivity)
             }
         }
     }

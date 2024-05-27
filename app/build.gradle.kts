@@ -1,7 +1,6 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    /*id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")*/
 }
 
 android {
@@ -20,6 +19,11 @@ android {
 
     buildFeatures{
         viewBinding = true
+        compose = true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.10"
     }
 
     buildTypes {
@@ -41,6 +45,9 @@ android {
 }
 
 dependencies {
+    implementation ("androidx.compose.ui:ui:1.6.7")
+    implementation ("androidx.compose.material:material:1.6.7")
+    implementation ("androidx.compose.ui:ui-tooling:1.6.7")
     implementation("me.sargunvohra.lib:pokekotlin:2.4.0")
     implementation("com.squareup.picasso:picasso:2.71828")
     implementation("androidx.core:core-ktx:1.13.1")
