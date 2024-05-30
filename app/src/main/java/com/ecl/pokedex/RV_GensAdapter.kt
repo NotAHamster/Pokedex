@@ -9,7 +9,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.card.MaterialCardView
 
-class RV_GensAdapter(private val dataset: List<GenItemData>, val theme: Theme, val onGenClicked: ((id: Int) -> Unit)) : RecyclerView.Adapter<RV_GensAdapter.ViewHolder>() {
+class RV_GensAdapter(val dataset: List<GenItemData>, val theme: Theme, val onGenClicked: ((id: Int) -> Unit)) : RecyclerView.Adapter<RV_GensAdapter.ViewHolder>() {
     //var onGenerationClicked: ((id: Int) -> Unit)? = null
     private var activePos = 0
 

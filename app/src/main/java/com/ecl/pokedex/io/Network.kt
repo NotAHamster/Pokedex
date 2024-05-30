@@ -2,6 +2,7 @@ package com.ecl.pokedex.io
 
 import me.sargunvohra.lib.pokekotlin.client.PokeApiClient
 import me.sargunvohra.lib.pokekotlin.model.Generation
+import me.sargunvohra.lib.pokekotlin.model.Move
 import me.sargunvohra.lib.pokekotlin.model.NamedApiResource
 import me.sargunvohra.lib.pokekotlin.model.NamedApiResourceList
 import me.sargunvohra.lib.pokekotlin.model.Pokedex
@@ -131,6 +132,10 @@ class Network {
 
     fun getGenerations(): List<NamedApiResource> {
         return apiClient.getGenerationList(0, 10000).results
+    }
+
+    fun getMoveData(id: Int): Move {
+        return apiClient.getMove(id)
     }
 
     fun onPause() {

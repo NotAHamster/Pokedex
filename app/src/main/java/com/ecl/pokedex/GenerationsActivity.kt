@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.ecl.pokedex.Globals.network
 import com.ecl.pokedex.databinding.ActivityGenerationsBinding
+import com.ecl.pokedex.databinding.NavLayoutBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -17,6 +18,7 @@ class GenerationsActivity: AppCompatActivity() {
     private lateinit var rvPokedexAdapter: RV_PokedexAdapter
     private lateinit var rvScrollListener: RV_PokedexScrollListener
     private lateinit var rvPokedex: RecyclerView
+    private lateinit var rvGensadapter: RV_GensAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,16 +27,24 @@ class GenerationsActivity: AppCompatActivity() {
         setContentView(binding.root)
         rvPokedex = binding.rvPokedex
 
-        NavDrawer(binding.navView, this)
+        val navBinding = NavLayoutBinding.bind(binding.root)
+        val navDrawer = NavDrawer(this, navBinding)
+        navDrawer.onGenClicked = {
+            loadGeneration(it)
+            rvGensadapter.setNewActive(rvGensadapter.dataset.indexOfFirst { genItem ->
+                genItem.id == it
+            })
+            true
+        }
 
         binding.rvGens.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
 
-        val defaultGen = 3
+        val defaultGen = intent.getIntExtra("default-gen", 3)
         CoroutineScope(Dispatchers.IO).launch {
             val data = getRVGensData()
 
             withContext(Dispatchers.Main) {
-                val rvGensadapter = RV_GensAdapter(data, theme) { id ->
+                rvGensadapter = RV_GensAdapter(data, theme) { id ->
                     loadGeneration(id)
                 }
                 rvGensadapter.setNewActive(defaultGen - 1)

@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.ecl.pokedex.Globals.network
 import com.ecl.pokedex.databinding.ActivityMainBinding
+import com.ecl.pokedex.databinding.NavLayoutBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -19,7 +20,8 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        NavDrawer(binding.navView, this)
+        val navBinding = NavLayoutBinding.bind(binding.root)
+        NavDrawer(this, navBinding)
 
         CoroutineScope(Dispatchers.IO).launch {
             val entries = network.getPokemonSpeciesList(0, 30).results
