@@ -2,7 +2,9 @@ package com.ecl.pokedex
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.ecl.pokedex.adapters.RV_PokedexAdapter
 import com.ecl.pokedex.Globals.network
+import com.ecl.pokedex.helpers.PokemonListUtils
 import com.ecl.pokedex.databinding.ActivityMainBinding
 import com.ecl.pokedex.databinding.NavLayoutBinding
 import kotlinx.coroutines.CoroutineScope

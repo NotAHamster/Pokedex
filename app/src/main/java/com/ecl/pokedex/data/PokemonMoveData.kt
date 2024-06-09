@@ -1,4 +1,4 @@
-package com.ecl.pokedex
+package com.ecl.pokedex.data
 
 data class PokemonMoveData(
     val id: Int,

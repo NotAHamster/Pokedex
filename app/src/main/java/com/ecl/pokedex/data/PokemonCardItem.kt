@@ -1,4 +1,4 @@
-package com.ecl.pokedex
+package com.ecl.pokedex.data
 
 import android.graphics.Bitmap
 

@@ -2,6 +2,7 @@ package com.ecl.pokedex
 
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.ecl.pokedex.adapters.RV_PokedexAdapter
 import kotlin.math.abs
 
 class RV_PokedexScrollListener(private val rvPokedexAdapter: RV_PokedexAdapter) : RecyclerView.OnScrollListener() {

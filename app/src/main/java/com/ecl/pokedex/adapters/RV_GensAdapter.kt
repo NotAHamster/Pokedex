@@ -1,4 +1,4 @@
-package com.ecl.pokedex
+package com.ecl.pokedex.adapters
 
 import android.content.res.ColorStateList
 import android.content.res.Resources.Theme
@@ -7,6 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.ecl.pokedex.helpers.ColorUtils
+import com.ecl.pokedex.data.GenItemData
+import com.ecl.pokedex.R
 import com.google.android.material.card.MaterialCardView
 
 class RV_GensAdapter(val dataset: List<GenItemData>, val theme: Theme, val onGenClicked: ((id: Int) -> Unit)) : RecyclerView.Adapter<RV_GensAdapter.ViewHolder>() {

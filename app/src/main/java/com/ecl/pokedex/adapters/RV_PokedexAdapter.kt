@@ -1,4 +1,4 @@
-package com.ecl.pokedex
+package com.ecl.pokedex.adapters
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -14,19 +14,24 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.ecl.pokedex.Globals.network
+import com.ecl.pokedex.PokemonActivity
+import com.ecl.pokedex.data.PokemonCardItem
+import com.ecl.pokedex.R
+import com.ecl.pokedex.io.NetworkRequestManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.sargunvohra.lib.pokekotlin.model.Pokemon
-import java.util.LinkedList
 
 class RV_PokedexAdapter(
     var dataset: List<PokemonCardItem>,
     imgSize: Int,
     context: Context
 ) : RecyclerView.Adapter<RV_PokedexAdapter.ViewHolder>() {
-    private val defaultImg: Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.card_foreground)
+    private val defaultImg: Bitmap = BitmapFactory.decodeResource(context.resources,
+        R.drawable.card_foreground
+    )
     var cardClick: OnClickEvent? = null
 
     val NRM = NetworkRequestManager(imgSize)
@@ -103,28 +108,4 @@ class RV_PokedexAdapter(
     }
 
     override fun getItemCount() = dataset.size
-}
-
-class NetworkRequestManager(var imgSize: Int) {
-    private val reqHistory: MutableList<Int> = LinkedList()
-    var onReceived: ((PCI_Data)->Unit)? = null
-
-    data class PCI_Data(val pos: Int, val id: Int, val bitmap: Bitmap)
-
-    fun reqData(id: Int, pos: Int): Boolean {
-        if (reqHistory.contains(id))
-            return false
-
-        reqHistory.add(id)
-        CoroutineScope(Dispatchers.IO).launch {
-            val pokemon = PokemonUtils(network.getPokemon(id))
-            val bitmap = pokemon.imageToBmp(imgSize)
-            withContext(Dispatchers.Main) {
-                onReceived?.invoke(PCI_Data(pos, id, bitmap))
-            }
-        }
-        return true
-    }
-
-    fun clearHistory() = reqHistory.clear()
 }

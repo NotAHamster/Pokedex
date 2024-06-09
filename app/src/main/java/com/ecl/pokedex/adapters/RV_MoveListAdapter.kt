@@ -1,11 +1,11 @@
-package com.ecl.pokedex.Adapters
+package com.ecl.pokedex.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SortedList
 import androidx.recyclerview.widget.SortedListAdapterCallback
-import com.ecl.pokedex.PokemonMoveData
+import com.ecl.pokedex.data.PokemonMoveData
 import com.ecl.pokedex.databinding.MoveListItemBinding
 
 class RV_MoveListAdapter: RecyclerView.Adapter<RV_MoveListAdapter.ViewHolder>() {

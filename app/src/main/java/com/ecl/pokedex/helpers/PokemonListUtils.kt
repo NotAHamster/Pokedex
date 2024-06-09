@@ -1,5 +1,6 @@
-package com.ecl.pokedex
+package com.ecl.pokedex.helpers
 
+import com.ecl.pokedex.data.PokemonCardItem
 import me.sargunvohra.lib.pokekotlin.model.NamedApiResource
 
 class PokemonListUtils(val namedApiResourceList: List<NamedApiResource>) {

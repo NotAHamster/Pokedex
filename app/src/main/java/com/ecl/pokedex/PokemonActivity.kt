@@ -14,9 +14,11 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.core.view.children
-import com.ecl.pokedex.Adapters.RV_MoveListAdapter
-import com.ecl.pokedex.Adapters.RV_MoveListAdapter.CompareBy
+import com.ecl.pokedex.adapters.RV_MoveListAdapter
+import com.ecl.pokedex.adapters.RV_MoveListAdapter.CompareBy
 import com.ecl.pokedex.Globals.network
+import com.ecl.pokedex.helpers.PokemonUtils
+import com.ecl.pokedex.data.PokemonMoveData
 import com.ecl.pokedex.databinding.ActivityPokemonBinding
 import com.ecl.pokedex.databinding.MoveListItemBinding
 import com.ecl.pokedex.databinding.NavLayoutBinding

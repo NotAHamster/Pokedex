@@ -1,7 +1,9 @@
-package com.ecl.pokedex
+package com.ecl.pokedex.helpers
 
 import android.graphics.Bitmap
 import android.widget.ImageView
+import com.ecl.pokedex.data.PokemonCardItem
+import com.ecl.pokedex.PokemonMoveInfo
 import com.squareup.picasso.Picasso
 import me.sargunvohra.lib.pokekotlin.model.Pokemon
 

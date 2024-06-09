@@ -5,7 +5,12 @@ import android.view.ViewTreeObserver
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.ecl.pokedex.adapters.RV_GensAdapter
+import com.ecl.pokedex.adapters.RV_PokedexAdapter
 import com.ecl.pokedex.Globals.network
+import com.ecl.pokedex.helpers.GenerationUtils
+import com.ecl.pokedex.helpers.PokemonListUtils
+import com.ecl.pokedex.data.GenItemData
 import com.ecl.pokedex.databinding.ActivityGenerationsBinding
 import com.ecl.pokedex.databinding.NavLayoutBinding
 import kotlinx.coroutines.CoroutineScope

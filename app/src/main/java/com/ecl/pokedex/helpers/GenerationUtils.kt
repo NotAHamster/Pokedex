@@ -1,4 +1,4 @@
-package com.ecl.pokedex
+package com.ecl.pokedex.helpers
 
 import me.sargunvohra.lib.pokekotlin.model.Generation
 import me.sargunvohra.lib.pokekotlin.model.NamedApiResource

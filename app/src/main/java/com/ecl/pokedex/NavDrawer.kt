@@ -4,7 +4,8 @@ import android.app.Activity
 import android.content.Intent
 import android.view.View
 import android.widget.ExpandableListView
-import com.ecl.pokedex.Adapters.ELV_NavAdapter
+import com.ecl.pokedex.adapters.ELV_NavAdapter
+import com.ecl.pokedex.data.GenItemData
 import com.ecl.pokedex.databinding.NavLayoutBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
