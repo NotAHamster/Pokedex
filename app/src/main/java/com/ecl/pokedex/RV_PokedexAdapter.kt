@@ -58,13 +58,17 @@ class RV_PokedexAdapter(
         fun invoke(position: Int) {
             val cardData = dataset[position]
 
-            val pokemonData: Pokemon =
-                network.getPokemon(cardData.name) ?: network.getPokemon(cardData.id)
+            CoroutineScope(Dispatchers.IO).launch {
+                val pokemonData: Pokemon =
+                    network.getPokemon(cardData.name) ?: network.getPokemon(cardData.id)
 
-            //val pokemonSpecies = network.getPokemonSpecies(pokemonData.species.id)
-            val intent = Intent(activity, PokemonActivity::class.java)
-            intent.putExtra("speciesId", pokemonData.species.id)
-            activity.startActivity(intent)
+                //val pokemonSpecies = network.getPokemonSpecies(pokemonData.species.id)
+                withContext(Dispatchers.Main) {
+                    val intent = Intent(activity, PokemonActivity::class.java)
+                    intent.putExtra("speciesId", pokemonData.species.id)
+                    activity.startActivity(intent)
+                }
+            }
         }
     }
 

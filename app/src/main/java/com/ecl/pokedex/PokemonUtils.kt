@@ -4,7 +4,6 @@ import android.graphics.Bitmap
 import android.widget.ImageView
 import com.squareup.picasso.Picasso
 import me.sargunvohra.lib.pokekotlin.model.Pokemon
-import me.sargunvohra.lib.pokekotlin.model.PokemonMove
 
 class PokemonUtils(private val pokemon: Pokemon) {
     fun imageInto(imageView: ImageView, size: Int) {
@@ -23,27 +22,29 @@ class PokemonUtils(private val pokemon: Pokemon) {
         return pokemon.name.replaceFirstChar { it.uppercaseChar() }
     }
 
-    fun moves(versionGroups: List<Int>): List<PokemonMove> {
-        val moves: MutableList<PokemonMove> = mutableListOf()
+    fun moves(versionGroups: List<Int>): List<PokemonMoveInfo> {
+        val moves: MutableList<PokemonMoveInfo> = mutableListOf()
 
         pokemon.moves.forEach {
-            if (it.versionGroupDetails.any {
+            val index = it.versionGroupDetails.indexOfFirst { vgd ->
                 versionGroups.any { vg ->
-                    vg == it.versionGroup.id
+                    vg == vgd.versionGroup.id
                 }
-            }) {
-                moves.add(it)
+            }
+            if (index > -1) {
+                moves.add(PokemonMoveInfo(it, index))
             }
         }
         return moves.toList()
     }
-    fun moves(versionGroup: Int): List<PokemonMove> {
-        val moves: MutableList<PokemonMove> = mutableListOf()
+    fun moves(versionGroup: Int): List<PokemonMoveInfo> {
+        val moves: MutableList<PokemonMoveInfo> = mutableListOf()
         pokemon.moves.forEach {
-            if (it.versionGroupDetails.any { vgd ->
+            val index = it.versionGroupDetails.indexOfFirst { vgd ->
                 vgd.versionGroup.id == versionGroup
-            }) {
-                moves.add(it)
+            }
+            if (index > -1) {
+                moves.add(PokemonMoveInfo(it, index))
             }
         }
         return moves.toList()

@@ -1,6 +1,7 @@
 package com.ecl.pokedex
 
 import android.os.Bundle
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -12,15 +13,19 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
+import androidx.core.view.children
+import com.ecl.pokedex.Adapters.RV_MoveListAdapter
+import com.ecl.pokedex.Adapters.RV_MoveListAdapter.CompareBy
 import com.ecl.pokedex.Globals.network
 import com.ecl.pokedex.databinding.ActivityPokemonBinding
+import com.ecl.pokedex.databinding.MoveListItemBinding
 import com.ecl.pokedex.databinding.NavLayoutBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.sargunvohra.lib.pokekotlin.model.Move
 import me.sargunvohra.lib.pokekotlin.model.Pokemon
+import me.sargunvohra.lib.pokekotlin.model.PokemonMove
 import me.sargunvohra.lib.pokekotlin.model.PokemonSpecies
 
 class PokemonActivity: AppCompatActivity() {
@@ -30,6 +35,7 @@ class PokemonActivity: AppCompatActivity() {
     private var isGeneration = false
     private var verGroup: Int = -1
     private lateinit var verGroups: List<Int>
+    private lateinit var rvMoveListAdapter: RV_MoveListAdapter
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,7 +55,44 @@ class PokemonActivity: AppCompatActivity() {
 
             CoroutineScope(Dispatchers.IO).launch {
                 val moveData = getMoveData()
-                //TODO(populate a recycler view with the move data)
+                val levelMoves = moveData.filter {
+                    it.learnMethod == "level-up"
+                }
+                val machineMoves = moveData.filter {
+                    it.learnMethod == "machine"
+                }
+                withContext(Dispatchers.Main) {
+                    rvMoveListAdapter = RV_MoveListAdapter()
+                    rvMoveListAdapter.replaceDataSet(levelMoves)
+                    binding.rvMoveList.adapter = rvMoveListAdapter
+
+                    binding.rvMoveList.viewTreeObserver.addOnGlobalLayoutListener {
+                        val maxHeight = binding.svCardContainer.height
+                        binding.rvMoveList.apply {
+                            if (height > maxHeight) {
+                                layoutParams.height = maxHeight
+                                requestLayout()
+                            }
+                        }
+                    }
+
+                    val headerBinding: MoveListItemBinding = binding.ilMoveListHeader
+                    val headerCallback: ((TextView) -> Unit) = { view ->
+                        when (view.text) {
+                            "Level" -> rvMoveListAdapter.sort(CompareBy.LearnLevel, true)
+                            "Name" -> rvMoveListAdapter.sort(CompareBy.Name, true)
+                            "Power" -> rvMoveListAdapter.sort(CompareBy.Power, true)
+                            "Acc" -> rvMoveListAdapter.sort(CompareBy.Acc, true)
+                            "PP" -> rvMoveListAdapter.sort(CompareBy.PP, true)
+                        }
+                    }
+
+                    headerBinding.root.children.forEach { child ->
+                        if (child is TextView) child.setOnClickListener {
+                            headerCallback.invoke(it as TextView)
+                        }
+                    }
+                }
             }
 
             withContext(Dispatchers.Main) {
@@ -80,7 +123,7 @@ class PokemonActivity: AppCompatActivity() {
         }
     }
 
-    private fun getMoveData(): List<Move> {
+    private fun getMoveData(): List<PokemonMoveData> {
         val pokemon = PokemonUtils(pokemon)
         val moves = if (isGeneration) {
             pokemon.moves(verGroups)
@@ -89,8 +132,32 @@ class PokemonActivity: AppCompatActivity() {
             pokemon.moves(verGroup)
         }
         return List(moves.size) {
-            network.getMoveData(moves[it].move.id)
-            //TODO(convert the moves into a concise data class)
+            lateinit var move: PokemonMoveData
+            val pokemonMoveVersion = moves[it].pokemonMove.versionGroupDetails.find { pmv ->
+                if (isGeneration) {
+                    verGroups.any {vg ->
+                        pmv.versionGroup.id == vg
+                    }
+                }
+                else {
+                    pmv.versionGroup.id == verGroup
+                }
+            }
+            network.getMoveData(moves[it].pokemonMove.move.id).apply {
+                if (pokemonMoveVersion != null) {
+                    move = PokemonMoveData(
+                        it,
+                        name,
+                        type.name,
+                        power,
+                        accuracy,
+                        pp,
+                        pokemonMoveVersion.levelLearnedAt,
+                        pokemonMoveVersion.moveLearnMethod.name
+                    )
+                }
+            }
+            move
         }
     }
 
@@ -119,3 +186,8 @@ class PokemonActivity: AppCompatActivity() {
         }
     }
 }
+
+data class PokemonMoveInfo(
+    val pokemonMove: PokemonMove,
+    val versionIndex: Int
+)

@@ -3,4 +3,9 @@
     <string name="card_pokemon_name">Pokemon</string>
     <string name="navigation_drawer_open">drawer open</string>
     <string name="navigation_drawer_close">drawer closed</string>
+    <string name="move_header_level">Level</string>
+    <string name="move_header_name">Name</string>
+    <string name="move_header_power">Power</string>
+    <string name="move_header_acc">Acc</string>
+    <string name="move_header_pp">PP</string>
 </resources>
