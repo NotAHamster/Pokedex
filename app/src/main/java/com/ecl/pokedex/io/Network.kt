@@ -1,75 +1,35 @@
 package com.ecl.pokedex.io
 
+import com.ecl.pokedex.Globals
+import com.ecl.pokedex.data.ECL_Move
+import com.ecl.pokedex.data.ECL_Pokemon
+import com.ecl.pokedex.data.ECL_PokemonSpecies
 import me.sargunvohra.lib.pokekotlin.client.PokeApiClient
 import me.sargunvohra.lib.pokekotlin.model.Generation
-import me.sargunvohra.lib.pokekotlin.model.Move
 import me.sargunvohra.lib.pokekotlin.model.NamedApiResource
 import me.sargunvohra.lib.pokekotlin.model.NamedApiResourceList
 import me.sargunvohra.lib.pokekotlin.model.Pokedex
-import me.sargunvohra.lib.pokekotlin.model.Pokemon
 import me.sargunvohra.lib.pokekotlin.model.PokemonEntry
-import me.sargunvohra.lib.pokekotlin.model.PokemonSpecies
 
 class Network {
     private val apiClient = PokeApiClient()
     private val cache = Cache()
 
-    private class Cache {
-        private val pokemon: MutableList<Pokemon> = mutableListOf()
-        private val pokemonSpecies: MutableList<PokemonSpecies> = mutableListOf()
-        private val pokedex: MutableList<Pokedex> = mutableListOf()
-        private val generation: MutableList<Generation> = mutableListOf()
-
-        fun getPokemon(id: Int): Pokemon? {
-            return pokemon.find { it.id == id }
-        }
-
-        fun getPokemon(name: String): Pokemon? {
-            return pokemon.find { it.name == name }
-        }
-
-        fun addPokemon(pokemon: Pokemon) {
-            this.pokemon.add(pokemon)
-        }
-
-        fun getPokemonSpecies(id: Int): PokemonSpecies? {
-            return pokemonSpecies.find { it.id == id }
-        }
-
-        fun addPokemonSpecies(pokemonSpecies: PokemonSpecies) {
-            this.pokemonSpecies.add(pokemonSpecies)
-        }
-
-        fun getPokedex(id: Int): Pokedex? {
-            return pokedex.find { it.id == id }
-        }
-
-        fun addPokedex(pokedex: Pokedex) {
-            this.pokedex.add(pokedex)
-        }
-
-        fun getGeneration(id: Int): Generation? {
-            return generation.find { it.id == id }
-        }
-
-        fun addGeneration(generation: Generation) {
-            this.generation.add(generation)
-        }
-
-        fun clear() {
-            pokemon.clear()
-            pokemonSpecies.clear()
-        }
-    }
-
-    fun getPokemon(id: Int): Pokemon {
-        val pokemon = cache.getPokemon(id)
+    fun getPokemon(id: Int, logRequest: Boolean = true): ECL_Pokemon {
+        var pokemon = cache.getPokemon(id, logRequest)
         return if (pokemon != null) {
             pokemon
         } else {
-            val poke = apiClient.getPokemon(id)
-            cache.addPokemon(poke)
-            poke
+            pokemon = Globals.LocalStorage?.get()?.getPokemon(id)
+            if (pokemon != null) {
+                cache.addPokemon(pokemon)
+                pokemon
+            }
+            else {
+                val poke = ECL_Pokemon(apiClient.getPokemon(id))
+                cache.addPokemon(poke)
+                poke
+            }
         }
     }
 
@@ -78,16 +38,16 @@ class Network {
      *
      * This does not try to request information from the API use if expecting the result to be cached.
      */
-    fun getPokemon(name: String): Pokemon? {
-        return cache.getPokemon(name.lowercase())
+    fun getPokemon(name: String): ECL_Pokemon? {
+        return cache.getPokemon(name)
     }
 
-    fun getPokemonSpecies(id: Int): PokemonSpecies {
+    fun getPokemonSpecies(id: Int): ECL_PokemonSpecies {
         val pokemonSpecies = cache.getPokemonSpecies(id)
         return if (pokemonSpecies != null) {
             pokemonSpecies
         } else {
-            val poke = apiClient.getPokemonSpecies(id)
+            val poke = ECL_PokemonSpecies(apiClient.getPokemonSpecies(id))
             cache.addPokemonSpecies(poke)
             poke
         }
@@ -134,11 +94,28 @@ class Network {
         return apiClient.getGenerationList(0, 10000).results
     }
 
-    fun getMoveData(id: Int): Move {
-        return apiClient.getMove(id)
+    fun getMoveData(id: Int, logRequest: Boolean = true): ECL_Move {
+        var move = cache.getMove(id, logRequest)
+        return if (move != null) {
+            move
+        } else {
+            move = Globals.LocalStorage?.get()?.getMove(id)
+            if (move != null) {
+                cache.addMove(move)
+                move
+            }
+            else {
+                move = ECL_Move(apiClient.getMove(id))
+                cache.addMove(move)
+                move
+            }
+        }
     }
 
     fun onPause() {
         cache.clear()
     }
+
+    fun addCacheListener(cacheListener: CacheListener) = cache.addCacheListener(cacheListener)
+    fun removeCacheListener(cacheListener: CacheListener) = cache.removeCacheListener(cacheListener)
 }

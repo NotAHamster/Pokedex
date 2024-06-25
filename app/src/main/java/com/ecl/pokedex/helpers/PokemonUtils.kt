@@ -4,10 +4,10 @@ import android.graphics.Bitmap
 import android.widget.ImageView
 import com.ecl.pokedex.data.PokemonCardItem
 import com.ecl.pokedex.PokemonMoveInfo
+import com.ecl.pokedex.data.ECL_Pokemon
 import com.squareup.picasso.Picasso
-import me.sargunvohra.lib.pokekotlin.model.Pokemon
 
-class PokemonUtils(private val pokemon: Pokemon) {
+class PokemonUtils(private val pokemon: ECL_Pokemon) {
     fun imageInto(imageView: ImageView, size: Int) {
         Picasso.get().load(pokemon.sprites.frontDefault).resize(size, size).into(imageView)
     }
@@ -30,7 +30,7 @@ class PokemonUtils(private val pokemon: Pokemon) {
         pokemon.moves.forEach {
             val index = it.versionGroupDetails.indexOfFirst { vgd ->
                 versionGroups.any { vg ->
-                    vg == vgd.versionGroup.id
+                    vg == vgd.versionId
                 }
             }
             if (index > -1) {
@@ -43,7 +43,7 @@ class PokemonUtils(private val pokemon: Pokemon) {
         val moves: MutableList<PokemonMoveInfo> = mutableListOf()
         pokemon.moves.forEach {
             val index = it.versionGroupDetails.indexOfFirst { vgd ->
-                vgd.versionGroup.id == versionGroup
+                vgd.versionId == versionGroup
             }
             if (index > -1) {
                 moves.add(PokemonMoveInfo(it, index))

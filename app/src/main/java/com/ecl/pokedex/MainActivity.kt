@@ -7,6 +7,7 @@ import com.ecl.pokedex.Globals.network
 import com.ecl.pokedex.helpers.PokemonListUtils
 import com.ecl.pokedex.databinding.ActivityMainBinding
 import com.ecl.pokedex.databinding.NavLayoutBinding
+import com.ecl.pokedex.io.CacheListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -18,6 +19,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        //Globals.LocalStorage.set(this)
+        CoroutineScope(Dispatchers.IO).launch {
+            network.addCacheListener(CacheListener(Globals.LocalStorage.set(this@MainActivity)))
+        }
         setTheme(Globals.themeID)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)

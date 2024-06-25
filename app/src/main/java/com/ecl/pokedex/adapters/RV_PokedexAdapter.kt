@@ -17,12 +17,12 @@ import com.ecl.pokedex.Globals.network
 import com.ecl.pokedex.PokemonActivity
 import com.ecl.pokedex.data.PokemonCardItem
 import com.ecl.pokedex.R
+import com.ecl.pokedex.data.ECL_Pokemon
 import com.ecl.pokedex.io.NetworkRequestManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.sargunvohra.lib.pokekotlin.model.Pokemon
 
 class RV_PokedexAdapter(
     var dataset: List<PokemonCardItem>,
@@ -64,13 +64,13 @@ class RV_PokedexAdapter(
             val cardData = dataset[position]
 
             CoroutineScope(Dispatchers.IO).launch {
-                val pokemonData: Pokemon =
+                val pokemonData: ECL_Pokemon =
                     network.getPokemon(cardData.name) ?: network.getPokemon(cardData.id)
 
                 //val pokemonSpecies = network.getPokemonSpecies(pokemonData.species.id)
                 withContext(Dispatchers.Main) {
                     val intent = Intent(activity, PokemonActivity::class.java)
-                    intent.putExtra("speciesId", pokemonData.species.id)
+                    intent.putExtra("speciesId", pokemonData.speciesID)
                     activity.startActivity(intent)
                 }
             }

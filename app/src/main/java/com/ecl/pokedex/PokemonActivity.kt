@@ -17,6 +17,9 @@ import androidx.core.view.children
 import com.ecl.pokedex.adapters.RV_MoveListAdapter
 import com.ecl.pokedex.adapters.RV_MoveListAdapter.CompareBy
 import com.ecl.pokedex.Globals.network
+import com.ecl.pokedex.data.ECL_Pokemon
+import com.ecl.pokedex.data.ECL_PokemonMove
+import com.ecl.pokedex.data.ECL_PokemonSpecies
 import com.ecl.pokedex.helpers.PokemonUtils
 import com.ecl.pokedex.data.PokemonMoveData
 import com.ecl.pokedex.databinding.ActivityPokemonBinding
@@ -26,14 +29,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.sargunvohra.lib.pokekotlin.model.Pokemon
-import me.sargunvohra.lib.pokekotlin.model.PokemonMove
-import me.sargunvohra.lib.pokekotlin.model.PokemonSpecies
 
 class PokemonActivity: AppCompatActivity() {
     private lateinit var binding: ActivityPokemonBinding
-    private lateinit var pokemonSpecies: PokemonSpecies
-    private lateinit var pokemon: Pokemon
+    private lateinit var pokemonSpecies: ECL_PokemonSpecies
+    private lateinit var pokemon: ECL_Pokemon
     private var isGeneration = false
     private var verGroup: Int = -1
     private lateinit var verGroups: List<Int>
@@ -51,7 +51,7 @@ class PokemonActivity: AppCompatActivity() {
 
         CoroutineScope(Dispatchers.IO).launch {
             pokemonSpecies = network.getPokemonSpecies(intent.getIntExtra("speciesId", 1))
-            val id = pokemonSpecies.varieties.find { it.isDefault }!!.pokemon.id
+            val id = pokemonSpecies.varieties.find { it.isDefault }!!.id
             pokemon = network.getPokemon(id)
             setVersionGroup()
 
@@ -119,7 +119,7 @@ class PokemonActivity: AppCompatActivity() {
         }
         else {
             isGeneration = true
-            val genId = intent.getIntExtra("generationID", pokemonSpecies.generation.id)
+            val genId = intent.getIntExtra("generationID", pokemonSpecies.generationId)
             val verData = network.getGendex(genId).versionGroups
             verGroups = List(verData.size) { verData[it].id }
         }
@@ -138,24 +138,24 @@ class PokemonActivity: AppCompatActivity() {
             val pokemonMoveVersion = moves[it].pokemonMove.versionGroupDetails.find { pmv ->
                 if (isGeneration) {
                     verGroups.any {vg ->
-                        pmv.versionGroup.id == vg
+                        pmv.versionId == vg
                     }
                 }
                 else {
-                    pmv.versionGroup.id == verGroup
+                    pmv.versionId == verGroup
                 }
             }
-            network.getMoveData(moves[it].pokemonMove.move.id).apply {
+            network.getMoveData(moves[it].pokemonMove.moveId, true).apply {
                 if (pokemonMoveVersion != null) {
                     move = PokemonMoveData(
                         it,
                         name,
-                        type.name,
+                        type,
                         power,
-                        accuracy,
+                        acc,
                         pp,
-                        pokemonMoveVersion.levelLearnedAt,
-                        pokemonMoveVersion.moveLearnMethod.name
+                        pokemonMoveVersion.learnLevel,
+                        pokemonMoveVersion.learnMethodName
                     )
                 }
             }
@@ -173,7 +173,7 @@ class PokemonActivity: AppCompatActivity() {
             .fillMaxSize()
             .background(Color.White)) {
             for (stat in pokemon.stats) {
-                val name = when (stat.stat.name) {
+                val name = when (stat.name) {
                     "hp" -> "HP"
                     "attack" -> "Attack"
                     "defense" -> "Defence"
@@ -190,6 +190,6 @@ class PokemonActivity: AppCompatActivity() {
 }
 
 data class PokemonMoveInfo(
-    val pokemonMove: PokemonMove,
+    val pokemonMove: ECL_PokemonMove,
     val versionIndex: Int
 )
