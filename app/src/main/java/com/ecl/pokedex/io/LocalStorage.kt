@@ -10,7 +10,6 @@ class LocalStorage(private val database: AppDatabase) {
     private val moveIds: MutableList<Int>
 
     init {
-        //pokemonIds = getIds().toMutableList()
         pokemonIds = database.pokemonDao().getPokemonIds().toMutableList()
         moveIds = database.movesDao().getMoveIds().toMutableList()
         Log.d("ecl.LocalStorage", "local storage loaded! ^.^")
@@ -53,9 +52,4 @@ class LocalStorage(private val database: AppDatabase) {
             }
         }
     }
-
-
-    /*private fun getIds(): List<Int> {
-        return database.pokemonDao().getPokemonIds()
-    }*/
 }

@@ -39,8 +39,21 @@ class NavDrawer(private val activity: Activity, binding: NavLayoutBinding) {
                                         )
                                     )
                                     activity.finish()
-                                    /*Theme.id = R.style.Theme_Pokedex_Red
-                                                activity.recreate()*/
+                                    true
+                                } else {
+                                    activity.recreate()
+                                    true
+                                }
+                            }
+                            "Settings" -> {
+                                if (activity.localClassName != SettingsActivity::class.simpleName) {
+                                    activity.startActivityForResult(
+                                        Intent(
+                                            activity,
+                                            SettingsActivity::class.java
+                                        ),
+                                        1
+                                    )
                                     true
                                 } else {
                                     activity.recreate()
@@ -63,6 +76,7 @@ class NavDrawer(private val activity: Activity, binding: NavLayoutBinding) {
         return listOf(
             ELV_NavAdapter.Group("National Dex", listOf()),
             ELV_NavAdapter.Group("Generation Dex", genData),
+            ELV_NavAdapter.Group("Settings", listOf())
         )
     }
 

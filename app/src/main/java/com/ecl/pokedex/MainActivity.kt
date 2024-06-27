@@ -1,5 +1,6 @@
 package com.ecl.pokedex
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.ecl.pokedex.adapters.RV_PokedexAdapter
@@ -43,6 +44,18 @@ class MainActivity : AppCompatActivity() {
                 rvPokedexAdapter.cardClick = rvPokedexAdapter.OnClickEvent(this@MainActivity)
             }
         }
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == 1 && data != null) {
+            if (data.getBooleanExtra("themeChanged", false)) {
+                recreate()
+            }
+        }
+
     }
 
     override fun onPause() {
