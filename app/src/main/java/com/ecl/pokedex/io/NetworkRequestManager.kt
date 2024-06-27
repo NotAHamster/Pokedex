@@ -21,7 +21,7 @@ class NetworkRequestManager(var imgSize: Int) {
 
         reqHistory.add(id)
         CoroutineScope(Dispatchers.IO).launch {
-            val pokemon = PokemonUtils(Globals.network.getPokemon(id))
+            val pokemon = PokemonUtils(Globals.network.getPokemon(id) ?: return@launch)
             val bitmap = pokemon.imageToBmp(imgSize)
             withContext(Dispatchers.Main) {
                 onReceived?.invoke(PCI_Data(pos, id, bitmap))

@@ -7,7 +7,7 @@ class CacheListener(val localStorage: LocalStorage) {
 
     private val pokemonIds: MutableMap<Int, Int> = mutableMapOf()
     private var pokemonIdsSum: Float = pokemonIds.values.sum().toFloat()
-    suspend fun onGetPokemonById(id: Int) {
+    fun onGetPokemonById(id: Int) {
         var sumOfId = 0
         val count = synchronized(pokemonIds) {
             sumOfId = pokemonIds.compute(id) { _, value -> (value ?: 0) + 1 }!!
@@ -15,7 +15,8 @@ class CacheListener(val localStorage: LocalStorage) {
             pokemonIds.count()
         }
         if (sumOfId > (pokemonIdsSum / count) + threshold) {
-            localStorage.addPokemon(network.getPokemon(id, logRequest = false))
+            val pokeRes = network.getPokemon(id, logRequest = false) ?: return
+            localStorage.addPokemon(pokeRes)
         }
     }
 
@@ -61,7 +62,8 @@ class CacheListener(val localStorage: LocalStorage) {
         val count = moves.compute(id) { _, value -> (value ?: 0) + 1}!!
         movesSum++
         if (count > (movesSum / moves.count()) + threshold) {
-            localStorage.addMove(network.getMoveData(id, logRequest = false))
+            val moveRes = network.getMoveData(id, logRequest = false) ?: return
+            localStorage.addMove(moveRes)
         }
     }
 }

@@ -50,9 +50,19 @@ class PokemonActivity: AppCompatActivity() {
         NavDrawer(this, navBinding)
 
         CoroutineScope(Dispatchers.IO).launch {
-            pokemonSpecies = network.getPokemonSpecies(intent.getIntExtra("speciesId", 1))
+            val pokemonSpeciesRes = network.getPokemonSpecies(intent.getIntExtra("speciesId", 1))
+            if (pokemonSpeciesRes == null) {
+                finish()
+                return@launch
+            }
+            pokemonSpecies = pokemonSpeciesRes
             val id = pokemonSpecies.varieties.find { it.isDefault }!!.id
-            pokemon = network.getPokemon(id)
+            val pokemonRes = network.getPokemon(id)
+            if (pokemonRes == null) {
+                finish()
+                return@launch
+            }
+            pokemon = pokemonRes
             setVersionGroup()
 
             withContext(Dispatchers.Main) {
@@ -111,8 +121,8 @@ class PokemonActivity: AppCompatActivity() {
         else {
             isGeneration = true
             val genId = intent.getIntExtra("generationID", pokemonSpecies.generationId)
-            val verData = network.getGendex(genId).versionGroups
-            verGroups = List(verData.size) { verData[it].id }
+            val verData = network.getGendex(genId)?.versionGroups
+            verGroups = List(verData?.size ?: 0) { verData!![it].id }
         }
     }
 
@@ -141,7 +151,7 @@ class PokemonActivity: AppCompatActivity() {
                 if (pokemonMoveVersion.learnMethodName != "level-up")
                     continue
 
-                val moveData = network.getMoveData(move.pokemonMove.moveId).let {
+                val moveData = network.getMoveData(move.pokemonMove.moveId)?.let {
                     PokemonMoveData(
                         it.id,
                         it.name,
@@ -153,8 +163,10 @@ class PokemonActivity: AppCompatActivity() {
                         pokemonMoveVersion.learnMethodName
                     )
                 }
-                withContext(Dispatchers.Main) {
-                    rvMoveListAdapter.insertData(moveData)
+                if (moveData != null) {
+                    withContext(Dispatchers.Main) {
+                        rvMoveListAdapter.insertData(moveData)
+                    }
                 }
             }
         }

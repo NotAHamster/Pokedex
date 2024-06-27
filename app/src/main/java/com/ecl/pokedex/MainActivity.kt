@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
         NavDrawer(this, navBinding)
 
         CoroutineScope(Dispatchers.IO).launch {
-            val entries = network.getPokemonSpeciesList(0, 30).results
+            val entries = network.getPokemonSpeciesList(0, 30)?.results ?: listOf()
 
             withContext(Dispatchers.Main) {
                 val pokemonCards = PokemonListUtils(entries).getCardItems()

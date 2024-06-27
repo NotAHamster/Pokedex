@@ -1,5 +1,6 @@
 package com.ecl.pokedex.io
 
+import android.util.Log
 import com.ecl.pokedex.Globals
 import com.ecl.pokedex.data.ECL_Move
 import com.ecl.pokedex.data.ECL_Pokemon
@@ -9,26 +10,31 @@ import me.sargunvohra.lib.pokekotlin.model.Generation
 import me.sargunvohra.lib.pokekotlin.model.NamedApiResource
 import me.sargunvohra.lib.pokekotlin.model.NamedApiResourceList
 import me.sargunvohra.lib.pokekotlin.model.Pokedex
-import me.sargunvohra.lib.pokekotlin.model.PokemonEntry
+import java.net.UnknownHostException
 
 class Network {
     private val apiClient = PokeApiClient()
     private val cache = Cache()
 
-    fun getPokemon(id: Int, logRequest: Boolean = true): ECL_Pokemon {
+    fun getPokemon(id: Int, logRequest: Boolean = true): ECL_Pokemon? {
         var pokemon = cache.getPokemon(id, logRequest)
-        return if (pokemon != null) {
-            pokemon
+        if (pokemon != null) {
+            return pokemon
         } else {
             pokemon = Globals.LocalStorage?.get()?.getPokemon(id)
             if (pokemon != null) {
                 cache.addPokemon(pokemon)
-                pokemon
+                return pokemon
             }
             else {
-                val poke = ECL_Pokemon(apiClient.getPokemon(id))
-                cache.addPokemon(poke)
-                poke
+                try {
+                    val poke = ECL_Pokemon(apiClient.getPokemon(id))
+                    cache.addPokemon(poke)
+                    return poke
+                } catch (e: UnknownHostException) {
+                    Log.e("com.ecl.network", "$e")
+                }
+                return null
             }
         }
     }
@@ -42,33 +48,48 @@ class Network {
         return cache.getPokemon(name)
     }
 
-    fun getPokemonSpecies(id: Int): ECL_PokemonSpecies {
-        val pokemonSpecies = cache.getPokemonSpecies(id)
-        return if (pokemonSpecies != null) {
-            pokemonSpecies
+    fun getPokemonSpecies(id: Int): ECL_PokemonSpecies? {
+        var pokemonSpecies = cache.getPokemonSpecies(id)
+        if (pokemonSpecies != null) {
+            return pokemonSpecies
         } else {
-            val poke = ECL_PokemonSpecies(apiClient.getPokemonSpecies(id))
-            cache.addPokemonSpecies(poke)
-            poke
+            try {
+                pokemonSpecies = ECL_PokemonSpecies(apiClient.getPokemonSpecies(id))
+                cache.addPokemonSpecies(pokemonSpecies)
+                return pokemonSpecies
+            } catch (e: UnknownHostException) {
+                Log.e("com.ecl.network", "$e")
+            }
+            return null
         }
     }
 
-    fun getPokemonSpeciesList(offset: Int, limit: Int): NamedApiResourceList {
-        return apiClient.getPokemonSpeciesList(offset, limit)
+    fun getPokemonSpeciesList(offset: Int, limit: Int): NamedApiResourceList? {
+        try {
+            return apiClient.getPokemonSpeciesList(offset, limit)
+        } catch (e: UnknownHostException) {
+            Log.e("com.ecl.network", "$e")
+        }
+        return null
     }
 
-    fun getPokedex(id: Int): Pokedex {
-        val pokedex = cache.getPokedex(id)
-        return if (pokedex != null) {
-            pokedex
+    fun getPokedex(id: Int): Pokedex? {
+        var pokedex = cache.getPokedex(id)
+        if (pokedex != null) {
+            return pokedex
         } else {
-            val dex = apiClient.getPokedex(id)
-            cache.addPokedex(dex)
-            dex
+            try {
+                pokedex = apiClient.getPokedex(id)
+                cache.addPokedex(pokedex)
+                return pokedex
+            } catch (e: UnknownHostException) {
+                Log.e("com.ecl.network", "$e")
+            }
+            return null
         }
     }
 
-    fun getPokedexEntryList(dexId: Int, offset: Int, limit: Int): List<PokemonEntry> {
+    /*fun getPokedexEntryList(dexId: Int, offset: Int, limit: Int): List<PokemonEntry>? {
         val entries = getPokedex(dexId).pokemonEntries
         return if (offset < entries.lastIndex)
             if (limit > entries.count())
@@ -77,24 +98,34 @@ class Network {
                 entries.subList(offset, limit)
         else
             listOf()
-    }
+    }*/
 
-    fun getGendex(id: Int): Generation {
-        val generation = cache.getGeneration(id)
-        return if (generation != null) {
-            generation
+    fun getGendex(id: Int): Generation? {
+        var generation = cache.getGeneration(id)
+        if (generation != null) {
+            return generation
         } else {
-            val gen = apiClient.getGeneration(id)
-            cache.addGeneration(gen)
-            gen
+            try {
+                generation = apiClient.getGeneration(id)
+                cache.addGeneration(generation)
+                return generation
+            } catch (e: UnknownHostException) {
+                Log.e("com.ecl.network", "$e")
+            }
+            return null
         }
     }
 
     fun getGenerations(): List<NamedApiResource> {
-        return apiClient.getGenerationList(0, 10000).results
+        try {
+            return apiClient.getGenerationList(0, 10000).results
+        } catch (e: UnknownHostException) {
+            Log.e("com.ecl.network", "$e")
+        }
+        return listOf()
     }
 
-    fun getMoveData(id: Int, logRequest: Boolean = true): ECL_Move {
+    fun getMoveData(id: Int, logRequest: Boolean = true): ECL_Move? {
         var move = cache.getMove(id, logRequest)
         return if (move != null) {
             move
@@ -105,9 +136,14 @@ class Network {
                 move
             }
             else {
-                move = ECL_Move(apiClient.getMove(id))
-                cache.addMove(move)
-                move
+                try {
+                    move = ECL_Move(apiClient.getMove(id))
+                    cache.addMove(move)
+                    return move
+                } catch (e: UnknownHostException) {
+                    Log.e("com.ecl.network", "$e")
+                }
+                return null
             }
         }
     }

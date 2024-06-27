@@ -42,7 +42,10 @@ class NavDrawer(private val activity: Activity, binding: NavLayoutBinding) {
                                     /*Theme.id = R.style.Theme_Pokedex_Red
                                                 activity.recreate()*/
                                     true
-                                } else false
+                                } else {
+                                    activity.recreate()
+                                    true
+                                }
                             }
 
                             else -> false

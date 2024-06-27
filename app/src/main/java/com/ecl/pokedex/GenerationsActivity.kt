@@ -58,7 +58,8 @@ class GenerationsActivity: AppCompatActivity() {
         }
 
         CoroutineScope(Dispatchers.IO).launch {
-            val gen = GenerationUtils(network.getGendex(defaultGen))
+            val genRes = network.getGendex(defaultGen) ?: return@launch
+            val gen = GenerationUtils(genRes)
             gen.sort()
 
             withContext(Dispatchers.Main) {
@@ -88,7 +89,8 @@ class GenerationsActivity: AppCompatActivity() {
 
     private fun loadGeneration(id: Int) {
         CoroutineScope(Dispatchers.IO).launch {
-            val gen = GenerationUtils(network.getGendex(id))
+            val genRes = network.getGendex(id) ?: return@launch
+            val gen = GenerationUtils(genRes)
             gen.sort()
 
             withContext(Dispatchers.Main) {

@@ -17,7 +17,6 @@ import com.ecl.pokedex.Globals.network
 import com.ecl.pokedex.PokemonActivity
 import com.ecl.pokedex.data.PokemonCardItem
 import com.ecl.pokedex.R
-import com.ecl.pokedex.data.ECL_Pokemon
 import com.ecl.pokedex.io.NetworkRequestManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -64,8 +63,10 @@ class RV_PokedexAdapter(
             val cardData = dataset[position]
 
             CoroutineScope(Dispatchers.IO).launch {
-                val pokemonData: ECL_Pokemon =
-                    network.getPokemon(cardData.name) ?: network.getPokemon(cardData.id)
+                /*val pokemonData: ECL_Pokemon =
+                    network.getPokemon(cardData.name) ?: network.getPokemon(cardData.id)*/
+
+                val pokemonData = network.getPokemon(cardData.id) ?: return@launch
 
                 //val pokemonSpecies = network.getPokemonSpecies(pokemonData.species.id)
                 withContext(Dispatchers.Main) {
