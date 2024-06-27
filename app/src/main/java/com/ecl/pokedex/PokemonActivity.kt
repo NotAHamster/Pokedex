@@ -55,46 +55,37 @@ class PokemonActivity: AppCompatActivity() {
             pokemon = network.getPokemon(id)
             setVersionGroup()
 
-            CoroutineScope(Dispatchers.IO).launch {
-                val moveData = getMoveData()
-                val levelMoves = moveData.filter {
-                    it.learnMethod == "level-up"
-                }
-                val machineMoves = moveData.filter {
-                    it.learnMethod == "machine"
-                }
-                withContext(Dispatchers.Main) {
-                    rvMoveListAdapter = RV_MoveListAdapter()
-                    rvMoveListAdapter.replaceDataSet(levelMoves)
-                    binding.rvMoveList.adapter = rvMoveListAdapter
+            withContext(Dispatchers.Main) {
+                rvMoveListAdapter = RV_MoveListAdapter()
+                binding.rvMoveList.adapter = rvMoveListAdapter
 
-                    binding.rvMoveList.viewTreeObserver.addOnGlobalLayoutListener {
-                        val maxHeight = binding.svCardContainer.height
-                        binding.rvMoveList.apply {
-                            if (height > maxHeight) {
-                                layoutParams.height = maxHeight
-                                requestLayout()
-                            }
-                        }
-                    }
-
-                    val headerBinding: MoveListItemBinding = binding.ilMoveListHeader
-                    val headerCallback: ((TextView) -> Unit) = { view ->
-                        when (view.text) {
-                            "Level" -> rvMoveListAdapter.sort(CompareBy.LearnLevel, true)
-                            "Name" -> rvMoveListAdapter.sort(CompareBy.Name, true)
-                            "Power" -> rvMoveListAdapter.sort(CompareBy.Power, true)
-                            "Acc" -> rvMoveListAdapter.sort(CompareBy.Acc, true)
-                            "PP" -> rvMoveListAdapter.sort(CompareBy.PP, true)
-                        }
-                    }
-
-                    headerBinding.root.children.forEach { child ->
-                        if (child is TextView) child.setOnClickListener {
-                            headerCallback.invoke(it as TextView)
+                binding.rvMoveList.viewTreeObserver.addOnGlobalLayoutListener {
+                    val maxHeight = binding.svCardContainer.height
+                    binding.rvMoveList.apply {
+                        if (height > maxHeight) {
+                            layoutParams.height = maxHeight
+                            requestLayout()
                         }
                     }
                 }
+
+                val headerBinding: MoveListItemBinding = binding.ilMoveListHeader
+                val headerCallback: ((TextView) -> Unit) = { view ->
+                    when (view.text) {
+                        "Level" -> rvMoveListAdapter.sort(CompareBy.LearnLevel, true)
+                        "Name" -> rvMoveListAdapter.sort(CompareBy.Name, true)
+                        "Power" -> rvMoveListAdapter.sort(CompareBy.Power, true)
+                        "Acc" -> rvMoveListAdapter.sort(CompareBy.Acc, true)
+                        "PP" -> rvMoveListAdapter.sort(CompareBy.PP, true)
+                    }
+                }
+
+                headerBinding.root.children.forEach { child ->
+                    if (child is TextView) child.setOnClickListener {
+                        headerCallback.invoke(it as TextView)
+                    }
+                }
+                requestMoveData()
             }
 
             withContext(Dispatchers.Main) {
@@ -125,41 +116,47 @@ class PokemonActivity: AppCompatActivity() {
         }
     }
 
-    private fun getMoveData(): List<PokemonMoveData> {
-        val pokemon = PokemonUtils(pokemon)
-        val moves = if (isGeneration) {
-            pokemon.moves(verGroups)
-        }
-        else {
-            pokemon.moves(verGroup)
-        }
-        return List(moves.size) {
-            lateinit var move: PokemonMoveData
-            val pokemonMoveVersion = moves[it].pokemonMove.versionGroupDetails.find { pmv ->
-                if (isGeneration) {
-                    verGroups.any {vg ->
-                        pmv.versionId == vg
-                    }
-                }
-                else {
-                    pmv.versionId == verGroup
-                }
+    private fun requestMoveData() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val pokemon = PokemonUtils(pokemon)
+            val moves = if (isGeneration) {
+                pokemon.moves(verGroups)
             }
-            network.getMoveData(moves[it].pokemonMove.moveId, true).apply {
-                if (pokemonMoveVersion != null) {
-                    move = PokemonMoveData(
-                        it,
-                        name,
-                        type,
-                        power,
-                        acc,
-                        pp,
+            else {
+                pokemon.moves(verGroup)
+            }
+
+            for (move in moves) {
+                val pokemonMoveVersion = move.pokemonMove.versionGroupDetails.find { pmv ->
+                    if (isGeneration) {
+                        verGroups.any {vg ->
+                            pmv.versionId == vg
+                        }
+                    }
+                    else {
+                        pmv.versionId == verGroup
+                    }
+                } ?: continue
+
+                if (pokemonMoveVersion.learnMethodName != "level-up")
+                    continue
+
+                val moveData = network.getMoveData(move.pokemonMove.moveId).let {
+                    PokemonMoveData(
+                        it.id,
+                        it.name,
+                        it.type,
+                        it.power,
+                        it.acc,
+                        it.pp,
                         pokemonMoveVersion.learnLevel,
                         pokemonMoveVersion.learnMethodName
                     )
                 }
+                withContext(Dispatchers.Main) {
+                    rvMoveListAdapter.insertData(moveData)
+                }
             }
-            move
         }
     }
 

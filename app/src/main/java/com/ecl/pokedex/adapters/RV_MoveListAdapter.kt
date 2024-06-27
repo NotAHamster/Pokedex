@@ -123,7 +123,7 @@ class RV_MoveListAdapter: RecyclerView.Adapter<RV_MoveListAdapter.ViewHolder>() 
         }
         override fun onInserted(position: Int, count: Int) {
             super.onInserted(position, count)
-            notifyItemRangeInserted(position, count)
+            notifyDataSetChanged()
         }
     }
 
@@ -188,5 +188,9 @@ class RV_MoveListAdapter: RecyclerView.Adapter<RV_MoveListAdapter.ViewHolder>() 
 
     fun replaceDataSet(dataset: List<PokemonMoveData>) {
         sortedList.replaceAll(dataset)
+    }
+
+    fun insertData(data: PokemonMoveData) {
+        sortedList.add(data)
     }
 }
