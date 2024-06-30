@@ -1,19 +1,19 @@
 package com.ecl.pokedex.io
 
+import com.ecl.pokedex.data.ECL_Generation
 import com.ecl.pokedex.data.ECL_Move
 import com.ecl.pokedex.data.ECL_Pokemon
 import com.ecl.pokedex.data.ECL_PokemonSpecies
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import me.sargunvohra.lib.pokekotlin.model.Generation
 import me.sargunvohra.lib.pokekotlin.model.Pokedex
 
 class Cache {
     private val pokemon: MutableList<ECL_Pokemon> = mutableListOf()
     private val pokemonSpecies: MutableList<ECL_PokemonSpecies> = mutableListOf()
     private val pokedex: MutableList<Pokedex> = mutableListOf()
-    private val generation: MutableList<Generation> = mutableListOf()
+    private val generation: MutableList<ECL_Generation> = mutableListOf()
     private val moves: MutableList<ECL_Move> = mutableListOf()
 
     private val cacheListeners: MutableList<CacheListener> = mutableListOf()
@@ -59,12 +59,12 @@ class Cache {
         this.pokedex.add(pokedex)
     }
 
-    fun getGeneration(id: Int): Generation? {
+    fun getGeneration(id: Int): ECL_Generation? {
         cacheListeners.forEach { it.onGetGeneration(id) }
         return generation.find { it.id == id }
     }
 
-    fun addGeneration(generation: Generation) {
+    fun addGeneration(generation: ECL_Generation) {
         this.generation.add(generation)
     }
 

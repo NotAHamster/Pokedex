@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ecl.pokedex.adapters.RV_GensAdapter
 import com.ecl.pokedex.adapters.RV_PokedexAdapter
 import com.ecl.pokedex.Globals.network
-import com.ecl.pokedex.helpers.GenerationUtils
+//import com.ecl.pokedex.helpers.GenerationUtils
 import com.ecl.pokedex.helpers.PokemonListUtils
 import com.ecl.pokedex.data.GenItemData
 import com.ecl.pokedex.databinding.ActivityGenerationsBinding
@@ -58,12 +58,11 @@ class GenerationsActivity: AppCompatActivity() {
         }
 
         CoroutineScope(Dispatchers.IO).launch {
-            val genRes = network.getGendex(defaultGen) ?: return@launch
-            val gen = GenerationUtils(genRes)
+            val gen = network.getGendex(defaultGen) ?: return@launch
             gen.sort()
 
             withContext(Dispatchers.Main) {
-                val pokemonCards = PokemonListUtils(gen.pokemon).getCardItems()
+                val pokemonCards = PokemonListUtils(gen.pokemonSpecies).getCardItems()
 
                 val size = binding.root.width / 3
                 rvPokedexAdapter = RV_PokedexAdapter(pokemonCards, size, this@GenerationsActivity)
@@ -89,12 +88,11 @@ class GenerationsActivity: AppCompatActivity() {
 
     private fun loadGeneration(id: Int) {
         CoroutineScope(Dispatchers.IO).launch {
-            val genRes = network.getGendex(id) ?: return@launch
-            val gen = GenerationUtils(genRes)
+            val gen = network.getGendex(id) ?: return@launch
             gen.sort()
 
             withContext(Dispatchers.Main) {
-                val pokemonCards = PokemonListUtils(gen.pokemon).getCardItems()
+                val pokemonCards = PokemonListUtils(gen.pokemonSpecies).getCardItems()
 
                 //set new data
                 rvPokedexAdapter.swapNewData(pokemonCards)

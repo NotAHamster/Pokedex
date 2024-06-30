@@ -1,5 +1,6 @@
 package com.ecl.pokedex.adapters
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -121,6 +122,7 @@ class RV_MoveListAdapter: RecyclerView.Adapter<RV_MoveListAdapter.ViewHolder>() 
             super.onRemoved(position, count)
             notifyItemRangeRemoved(position, count)
         }
+        @SuppressLint("NotifyDataSetChanged")
         override fun onInserted(position: Int, count: Int) {
             super.onInserted(position, count)
             notifyDataSetChanged()

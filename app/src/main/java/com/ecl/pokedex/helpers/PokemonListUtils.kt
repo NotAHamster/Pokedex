@@ -1,9 +1,9 @@
 package com.ecl.pokedex.helpers
 
+import com.ecl.pokedex.data.ECL_NAPI_Resource
 import com.ecl.pokedex.data.PokemonCardItem
-import me.sargunvohra.lib.pokekotlin.model.NamedApiResource
 
-class PokemonListUtils(val namedApiResourceList: List<NamedApiResource>) {
+class PokemonListUtils(val namedApiResourceList: List<ECL_NAPI_Resource>) {
 
     fun getCardItems(): List<PokemonCardItem> {
         return List(

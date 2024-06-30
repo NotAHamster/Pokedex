@@ -2,7 +2,6 @@ package com.ecl.pokedex.io
 
 import android.graphics.Bitmap
 import com.ecl.pokedex.Globals
-import com.ecl.pokedex.helpers.PokemonUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -21,7 +20,7 @@ class NetworkRequestManager(var imgSize: Int) {
 
         reqHistory.add(id)
         CoroutineScope(Dispatchers.IO).launch {
-            val pokemon = PokemonUtils(Globals.network.getPokemon(id) ?: return@launch)
+            val pokemon = Globals.network.getPokemon(id) ?: return@launch
             val bitmap = pokemon.imageToBmp(imgSize)
             withContext(Dispatchers.Main) {
                 onReceived?.invoke(PCI_Data(pos, id, bitmap))

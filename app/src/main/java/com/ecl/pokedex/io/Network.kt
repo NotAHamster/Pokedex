@@ -2,13 +2,12 @@ package com.ecl.pokedex.io
 
 import android.util.Log
 import com.ecl.pokedex.Globals
+import com.ecl.pokedex.data.ECL_Generation
 import com.ecl.pokedex.data.ECL_Move
+import com.ecl.pokedex.data.ECL_NAPI_Resource
 import com.ecl.pokedex.data.ECL_Pokemon
 import com.ecl.pokedex.data.ECL_PokemonSpecies
 import me.sargunvohra.lib.pokekotlin.client.PokeApiClient
-import me.sargunvohra.lib.pokekotlin.model.Generation
-import me.sargunvohra.lib.pokekotlin.model.NamedApiResource
-import me.sargunvohra.lib.pokekotlin.model.NamedApiResourceList
 import me.sargunvohra.lib.pokekotlin.model.Pokedex
 import java.net.UnknownHostException
 
@@ -64,13 +63,16 @@ class Network {
         }
     }
 
-    fun getPokemonSpeciesList(offset: Int, limit: Int): NamedApiResourceList? {
+    fun getPokemonSpeciesList(offset: Int, limit: Int): List<ECL_NAPI_Resource> {
         try {
-            return apiClient.getPokemonSpeciesList(offset, limit)
+            val res = apiClient.getPokemonSpeciesList(offset, limit).results
+            return List(res.size) {
+                ECL_NAPI_Resource(res[it])
+            }
         } catch (e: UnknownHostException) {
             Log.e("com.ecl.network", "$e")
         }
-        return null
+        return listOf()
     }
 
     fun getPokedex(id: Int): Pokedex? {
@@ -100,13 +102,13 @@ class Network {
             listOf()
     }*/
 
-    fun getGendex(id: Int): Generation? {
+    fun getGendex(id: Int): ECL_Generation? {
         var generation = cache.getGeneration(id)
         if (generation != null) {
             return generation
         } else {
             try {
-                generation = apiClient.getGeneration(id)
+                generation = ECL_Generation(apiClient.getGeneration(id))
                 cache.addGeneration(generation)
                 return generation
             } catch (e: UnknownHostException) {
@@ -116,9 +118,12 @@ class Network {
         }
     }
 
-    fun getGenerations(): List<NamedApiResource> {
+    fun getGenerations(): List<ECL_NAPI_Resource> {
         try {
-            return apiClient.getGenerationList(0, 10000).results
+            val res = apiClient.getGenerationList(0, 10000).results
+            return List(res.size) {
+                ECL_NAPI_Resource(res[it])
+            }
         } catch (e: UnknownHostException) {
             Log.e("com.ecl.network", "$e")
         }

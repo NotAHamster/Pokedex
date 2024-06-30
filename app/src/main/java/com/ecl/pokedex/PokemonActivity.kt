@@ -20,7 +20,6 @@ import com.ecl.pokedex.Globals.network
 import com.ecl.pokedex.data.ECL_Pokemon
 import com.ecl.pokedex.data.ECL_PokemonMove
 import com.ecl.pokedex.data.ECL_PokemonSpecies
-import com.ecl.pokedex.helpers.PokemonUtils
 import com.ecl.pokedex.data.PokemonMoveData
 import com.ecl.pokedex.databinding.ActivityPokemonBinding
 import com.ecl.pokedex.databinding.MoveListItemBinding
@@ -99,9 +98,8 @@ class PokemonActivity: AppCompatActivity() {
             }
 
             withContext(Dispatchers.Main) {
-                val pokeUtil = PokemonUtils(pokemon)
-                pokeUtil.imageInto(binding.ivPokemon, 240)
-                binding.tvPokemonName.text = pokeUtil.name()
+                pokemon.imageInto(binding.ivPokemon, 240)
+                binding.tvPokemonName.text = pokemon.name()
 
                 val composeView = binding.cvStats
                 composeView.setContent {
@@ -128,7 +126,6 @@ class PokemonActivity: AppCompatActivity() {
 
     private fun requestMoveData() {
         CoroutineScope(Dispatchers.IO).launch {
-            val pokemon = PokemonUtils(pokemon)
             val moves = if (isGeneration) {
                 pokemon.moves(verGroups)
             }
