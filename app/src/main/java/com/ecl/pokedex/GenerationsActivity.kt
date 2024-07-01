@@ -34,7 +34,7 @@ class GenerationsActivity: AppCompatActivity() {
 
         val navBinding = NavLayoutBinding.bind(binding.root)
         val navDrawer = NavDrawer(this, navBinding)
-        navDrawer.onGenClicked = {
+        navDrawer.onCurrentActivityClicked = {
             loadGeneration(it)
             rvGensadapter.setNewActive(rvGensadapter.dataset.indexOfFirst { genItem ->
                 genItem.id == it

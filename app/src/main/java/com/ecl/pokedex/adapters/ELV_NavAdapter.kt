@@ -14,15 +14,22 @@ class ELV_NavAdapter(
     val groupData: List<Group>
 ) : BaseExpandableListAdapter() {
 
-    data class Group(val header: String, val children: List<GenItemData>)
+    abstract class Group {
+        abstract val header: String
+        open val children: List<Child> = listOf()
+    }
+    abstract class Child {
+        abstract val name: String
+    }
+    //data class Group(val header: String, val children: List<GenItemData>)
 
 
     override fun getGroupCount(): Int {
-        return groupData.size
+        return groupData.count()
     }
 
     override fun getChildrenCount(groupPosition: Int): Int {
-        return groupData[groupPosition].children.size
+        return groupData[groupPosition].children.count()
     }
 
     override fun getGroup(groupPosition: Int): Any {
@@ -30,6 +37,8 @@ class ELV_NavAdapter(
     }
 
     override fun getChild(groupPosition: Int, childPosition: Int): Any {
+
+
         return groupData[groupPosition].children[childPosition]
     }
 

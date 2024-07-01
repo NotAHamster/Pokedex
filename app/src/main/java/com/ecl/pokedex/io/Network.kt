@@ -153,6 +153,18 @@ class Network {
         }
     }
 
+    fun getVersions(): List<ECL_NAPI_Resource> {
+        try {
+            val res = apiClient.getVersionGroupList(0, 10000).results
+            return List(res.size) {
+                ECL_NAPI_Resource(res[it])
+            }
+        } catch (e: UnknownHostException) {
+            Log.e("com.ecl.network", "$e")
+        }
+        return listOf()
+    }
+
     fun onPause() {
         cache.clear()
     }
