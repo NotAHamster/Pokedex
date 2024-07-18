@@ -4,8 +4,10 @@ import com.ecl.pokedex.data.ECL_Generation
 import com.ecl.pokedex.data.ECL_Move
 import com.ecl.pokedex.data.ECL_Pokemon
 import com.ecl.pokedex.data.ECL_PokemonSpecies
+import com.ecl.pokedex.interfaces.NetworkReq
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import me.sargunvohra.lib.pokekotlin.model.Pokedex
 
@@ -98,5 +100,28 @@ class Cache {
     }
     fun removeCacheListener(cacheListener: CacheListener) {
         cacheListeners.remove(cacheListener)
+    }
+
+    fun findMoves(reqs: MutableList<NetworkReq>, callback: (ECL_Move, NetworkReq) -> Unit): MutableList<NetworkReq> {
+        val reqLog = List(reqs.size) { reqs[it].id }
+        CoroutineScope(Job()).launch {
+            reqLog.forEach { req ->
+                cacheListeners.forEach {
+                    it.onGetMove(req)
+                }
+            }
+        }
+        for (move in moves) {
+            val index = reqs.indexOfFirst { it.id == move.id }
+            if (index > -1) {
+                val req = reqs.removeAt(index)
+                CoroutineScope(Job()).launch {
+                    callback.invoke(move, req)
+                }
+                if (reqs.isEmpty())
+                    break;
+            }
+        }
+        return reqs
     }
 }

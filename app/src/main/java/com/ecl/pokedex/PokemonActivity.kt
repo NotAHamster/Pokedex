@@ -24,8 +24,10 @@ import com.ecl.pokedex.data.PokemonMoveData
 import com.ecl.pokedex.databinding.ActivityPokemonBinding
 import com.ecl.pokedex.databinding.MoveListItemBinding
 import com.ecl.pokedex.databinding.NavLayoutBinding
+import com.ecl.pokedex.interfaces.NetworkReq
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -33,8 +35,6 @@ class PokemonActivity: AppCompatActivity() {
     private lateinit var binding: ActivityPokemonBinding
     private lateinit var pokemonSpecies: ECL_PokemonSpecies
     private lateinit var pokemon: ECL_Pokemon
-    private var isGeneration = false
-    private var verGroup: Int = -1
     private lateinit var verGroups: List<Int>
     private lateinit var rvMoveListAdapter: RV_MoveListAdapter
 
@@ -94,7 +94,7 @@ class PokemonActivity: AppCompatActivity() {
                         headerCallback.invoke(it as TextView)
                     }
                 }
-                requestMoveData()
+                requestMoveData("level-up")
             }
 
             withContext(Dispatchers.Main) {
@@ -113,57 +113,56 @@ class PokemonActivity: AppCompatActivity() {
         val vgID = intent.getIntExtra("versionGroupID", -1)
 
         if (vgID > -1) {
-            verGroup = vgID
+            //verGroup = vgID
+            verGroups = listOf(vgID)
             return
         }
         else {
-            isGeneration = true
+            //isGeneration = true
             val genId = intent.getIntExtra("generationID", pokemonSpecies.generationId)
             val verData = network.getGendex(genId)?.versionGroups
             verGroups = List(verData?.size ?: 0) { verData!![it].id }
         }
     }
 
-    private fun requestMoveData() {
-        CoroutineScope(Dispatchers.IO).launch {
-            val moves = if (isGeneration) {
-                pokemon.moves(verGroups)
-            }
-            else {
-                pokemon.moves(verGroup)
-            }
+    class NetworkMoveReq(
+        override val id: Int,
+        val learnMethod: String,
+        val learnLevel: Int
+    ): NetworkReq
 
-            for (move in moves) {
-                val pokemonMoveVersion = move.pokemonMove.versionGroupDetails.find { pmv ->
-                    if (isGeneration) {
-                        verGroups.any {vg ->
-                            pmv.versionId == vg
-                        }
-                    }
-                    else {
-                        pmv.versionId == verGroup
-                    }
-                } ?: continue
+    private fun requestMoveData(learnMethod: String) {
+        CoroutineScope(Job()).launch {
+            val moves = pokemon.moves(verGroups)
 
-                if (pokemonMoveVersion.learnMethodName != "level-up")
-                    continue
-
-                val moveData = network.getMoveData(move.pokemonMove.moveId)?.let {
-                    PokemonMoveData(
-                        it.id,
-                        it.name,
-                        it.type,
-                        it.power,
-                        it.acc,
-                        it.pp,
-                        pokemonMoveVersion.learnLevel,
-                        pokemonMoveVersion.learnMethodName
+            val levelMoves: MutableList<NetworkReq> = mutableListOf()
+            moves.forEach {
+                val versionInfo = it.pokemonMove.versionGroupDetails[it.versionIndex]
+                if (versionInfo.learnMethodName == learnMethod) {
+                    levelMoves.add(
+                        NetworkMoveReq(
+                            it.pokemonMove.moveId,
+                            versionInfo.learnMethodName,
+                            versionInfo.learnLevel
+                        )
                     )
                 }
-                if (moveData != null) {
-                    withContext(Dispatchers.Main) {
-                        rvMoveListAdapter.insertData(moveData)
-                    }
+            }
+
+            network.getMoveData(levelMoves) { move, req ->
+                val moveReq = req as NetworkMoveReq
+                val moveData = PokemonMoveData(
+                    move.id,
+                    move.name,
+                    move.type,
+                    move.power,
+                    move.acc,
+                    move.pp,
+                    moveReq.learnLevel,
+                    moveReq.learnMethod
+                )
+                CoroutineScope(Dispatchers.Main).launch {
+                    rvMoveListAdapter.insertData(moveData)
                 }
             }
         }

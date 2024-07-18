@@ -4,6 +4,10 @@ import android.util.Log
 import com.ecl.pokedex.data.AppDatabase
 import com.ecl.pokedex.data.ECL_Move
 import com.ecl.pokedex.data.ECL_Pokemon
+import com.ecl.pokedex.interfaces.NetworkReq
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 class LocalStorage(private val database: AppDatabase) {
     private val pokemonIds: MutableList<Int>
@@ -51,5 +55,19 @@ class LocalStorage(private val database: AppDatabase) {
                 Log.d("ecl.LocalStorage", "${move.name} added to database")
             }
         }
+    }
+
+    fun findMoves(reqs: MutableList<NetworkReq>, callback: (ECL_Move, NetworkReq) -> Unit): MutableList<NetworkReq> {
+        val returnReqs: MutableList<NetworkReq> = mutableListOf()
+        for (req in reqs) {
+            val move = database.movesDao().getMoveById(req.id)
+            if (move.isEmpty())
+                returnReqs.add(req)
+            else
+                CoroutineScope(Job()).launch {
+                    callback.invoke(move[0], req)
+                }
+        }
+        return returnReqs
     }
 }

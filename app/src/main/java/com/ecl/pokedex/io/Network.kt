@@ -7,6 +7,10 @@ import com.ecl.pokedex.data.ECL_Move
 import com.ecl.pokedex.data.ECL_NAPI_Resource
 import com.ecl.pokedex.data.ECL_Pokemon
 import com.ecl.pokedex.data.ECL_PokemonSpecies
+import com.ecl.pokedex.interfaces.NetworkReq
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import me.sargunvohra.lib.pokekotlin.client.PokeApiClient
 import me.sargunvohra.lib.pokekotlin.model.Pokedex
 import java.net.UnknownHostException
@@ -149,6 +153,24 @@ class Network {
                     Log.e("com.ecl.network", "$e")
                 }
                 return null
+            }
+        }
+    }
+
+    fun getMoveData(reqs: MutableList<NetworkReq>, callback: (ECL_Move, NetworkReq) -> Unit) {
+        var reqs = cache.findMoves(reqs, callback)
+        if (reqs.isEmpty()) return
+        reqs = Globals.LocalStorage?.get()?.findMoves(reqs, callback)?: reqs
+        for (req in reqs) {
+            try {
+                val move = ECL_Move(apiClient.getMove(req.id))
+                cache.addMove(move)
+                CoroutineScope(Job()).launch {
+                    callback.invoke(move, req)
+                }
+            } catch (e: UnknownHostException) {
+                Log.e("com.ecl.network", "$e")
+                return
             }
         }
     }
