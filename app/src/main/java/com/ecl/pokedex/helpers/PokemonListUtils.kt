@@ -15,4 +15,10 @@ class PokemonListUtils(val namedApiResourceList: List<ECL_NAPI_Resource>) {
             }
         )
     }
+
+    fun getPokemonNames(): Array<String> {
+        return Array(namedApiResourceList.size) {
+            namedApiResourceList[it].name.replaceFirstChar { it.uppercaseChar() }
+        }
+    }
 }
